@@ -5,4 +5,9 @@ rvm:
   - 2.3.5
   - 2.4.2
   - ruby-head
-before_install: gem install bundler
+addons:
+  code_climate:
+    repo_token: d81350f440f981f869cc37fff76ba610a27e6b2bd442999057e9ad18100216dc
+# regular test configuration
+after_success:
+  - bundle exec codeclimate-test-reporterjI
