@@ -1,5 +1,10 @@
 # SimpleReports
 
+[![Build Status](https://travis-ci.org/lostapathy/simple_report.svg?branch=master)](https://travis-ci.org/lostapathy/simple_report)
+[![Code Climate](https://codeclimate.com/github/lostapathy/simple_report/badges/gpa.svg)](https://codeclimate.com/github/lostapathy/simple_report)
+[![Test Coverage](https://codeclimate.com/github/lostapathy/simple_report/badges/coverage.svg)](https://codeclimate.com/github/lostapathy/simple_report/coverage)
+
+
 simple_report is a gem for building simple reports from Enumerable collections.  It was extracted from a larger application and only supports Excel exports for now, but other formats could be added.
 
 ## Installation
