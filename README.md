@@ -1,4 +1,4 @@
-# SimpleReport
+# simple_report
 
 [![Build Status](https://travis-ci.org/lostapathy/simple_report.svg?branch=master)](https://travis-ci.org/lostapathy/simple_report)
 [![Code Climate](https://api.codeclimate.com/v1/badges/04ced70d7b66d1a7c42d/maintainability)](https://codeclimate.com/github/lostapathy/simple_report)
