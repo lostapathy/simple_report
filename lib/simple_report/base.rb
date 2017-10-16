@@ -1,5 +1,9 @@
 module SimpleReport
   class Base
+    def initialize
+      @sheets = []
+    end
+
     def add_format(name, format)
       @formats ||= {}
       @formats[name] = format
@@ -7,9 +11,7 @@ module SimpleReport
 
     def report_xls(*params)
       report(*params)
-
       generate_report
-
       @workbook.close
       File.read @file.path
     end
@@ -19,7 +21,6 @@ module SimpleReport
     def add_sheet(name, data)
       sheet = Sheet.new(name, data)
       yield sheet
-      @sheets ||= []
       @sheets << sheet
     end
 
@@ -27,14 +28,12 @@ module SimpleReport
       @file = Tempfile.new('simple_report')
       @workbook = WriteXLSX.new(@file.path)
       add_formats
-
       @sheets.each do |sheet|
         output_sheet = @workbook.add_worksheet(sheet.name)
         sheet.fields.each_with_index do |f, index|
           output_sheet.set_column(index, index, f.width)
           output_sheet.write(0, index, f.name, @formats[:heading])
         end
-
         sheet.collection.each_with_index do |ic, row|
           sheet.fields.each_with_index do |field, column|
             if field.field
@@ -67,6 +66,5 @@ module SimpleReport
       percent.set_num_format('0%')
       add_format :percent, percent
     end
-
   end
 end

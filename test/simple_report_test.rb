@@ -2,7 +2,11 @@ require "test_helper"
 
 class EmptyReport < SimpleReport::Base
   def report
-    add_sheet 'First tab', (1..10) do | sheet |
+    add_sheet 'First tab', (1..10) do |sheet|
+      sheet.add_field('Field Name', width: 20) { |x| x }
+
+    end
+    add_sheet 'Second tab', (1..10) do |sheet|
       sheet.add_field('Field Name', width: 20) { |x| x }
 
     end
