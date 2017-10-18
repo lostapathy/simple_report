@@ -9,18 +9,17 @@ module SimpleReport
       @formats[name] = format
     end
 
-    def report_xls(*params)
-      report(*params)
+    def to_xlsx(*params)
+      build_report(*params)
       generate_report
       @workbook.close
       File.read @file.path
     end
 
-    private
-
     def add_sheet(name, data)
       sheet = Sheet.new(name, data)
       yield sheet
+      @sheets ||= []
       @sheets << sheet
     end
 
@@ -65,6 +64,10 @@ module SimpleReport
       percent = @workbook.add_format
       percent.set_num_format('0%')
       add_format :percent, percent
+    end
+
+    def build_report
+      raise NotImplementedError.new('<report>#build_report not implemented')
     end
   end
 end
