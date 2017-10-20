@@ -1,0 +1,7 @@
+pipeline:
+  build:
+    image: ruby:2.4
+    pull: true
+    commands:
+      - bundle install
+      - bundle exec rake test
