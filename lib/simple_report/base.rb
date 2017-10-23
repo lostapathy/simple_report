@@ -33,16 +33,16 @@ module SimpleReport
           output_sheet.set_column(index, index, f.width)
           output_sheet.write(0, index, f.name, @formats[:heading])
         end
-        sheet.collection.each_with_index do |ic, row|
+        sheet.collection.each_with_index do |ic, record_num|
           sheet.fields.each_with_index do |field, column|
             if field.field
               value = ic.send(field.field)
             elsif field.value
               value = field.value
             elsif field.block
-              value = field.block.call(ic)
+              value = field.block.call(ic, record_num + 2)
             end
-            output_sheet.write(row + 1, column, value, find_format(field.format))
+            output_sheet.write(record_num + 1, column, value, find_format(field.format))
           end
         end
       end
@@ -62,7 +62,7 @@ module SimpleReport
       add_format :heading, heading
 
       percent = @workbook.add_format
-      percent.set_num_format('0%')
+      percent.set_num_format('0.0%')
       add_format :percent, percent
     end
 

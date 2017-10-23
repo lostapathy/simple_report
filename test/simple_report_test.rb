@@ -32,6 +32,14 @@ class FieldReport < SimpleReport::Base
   end
 end
 
+class BlockReport < SimpleReport::Base
+  def build_report
+    add_sheet 'First tab', (1..10) do |sheet|
+      sheet.add_field('test') { |row, index| "=B#{index}" }
+    end
+  end
+end
+
 
 class SimpleReportTest < Minitest::Test
   def test_that_it_has_a_version_number
@@ -63,6 +71,12 @@ class SimpleReportTest < Minitest::Test
 
   def test_field_types
     report = FieldReport.new
+    data = report.to_xlsx
+    refute_nil data
+  end
+
+  def test_block_report
+    report = BlockReport.new
     data = report.to_xlsx
     refute_nil data
   end
