@@ -42,7 +42,14 @@ module SimpleReport
             elsif field.block
               value = field.block.call(ic, record_num + 2)
             end
-            output_sheet.write(record_num + 1, column, value, find_format(field.format))
+            case field.force
+            when nil
+              output_sheet.write(record_num + 1, column, value, find_format(field.format))
+            when :string
+              output_sheet.write_string(record_num + 1, column, value, find_format(field.format))
+            else
+              raise "invalid force param"
+            end
           end
         end
       end
