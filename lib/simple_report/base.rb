@@ -12,7 +12,8 @@ module SimpleReport
     def to_xlsx(*params)
       build_report(*params)
       generate_report
-      @workbook.close
+      @file = Tempfile.new(%w[simple_report .xlsx])
+      @workbook.write(@file.path)
       File.read @file.path
     end
 
@@ -24,14 +25,13 @@ module SimpleReport
     end
 
     def generate_report
-      @file = Tempfile.new('simple_report')
-      @workbook = WriteXLSX.new(@file.path)
+      @workbook = RubyXL::Workbook.new
       add_formats
       @sheets.each do |sheet|
         output_sheet = @workbook.add_worksheet(sheet.name)
         sheet.fields.each_with_index do |f, index|
-          output_sheet.set_column(index, index, f.width)
-          output_sheet.write(0, index, f.name, @formats[:heading])
+          output_sheet.change_column_width(index, f.width) unless f.width.nil?
+          output_sheet.add_cell(0, index, f.name) #, @formats[:heading])
         end
         sheet.collection.each_with_index do |ic, record_num|
           sheet.fields.each_with_index do |field, column|
@@ -42,11 +42,12 @@ module SimpleReport
             elsif field.block
               value = field.block.call(ic, record_num + 2)
             end
+
             case field.force
             when nil
-              output_sheet.write(record_num + 1, column, value, find_format(field.format))
+              output_sheet.add_cell(record_num + 1, column, value)#, find_format(field.format))
             when :string
-              output_sheet.write_string(record_num + 1, column, value, find_format(field.format))
+              output_sheet.add_cell(record_num + 1, column, value.to_s) #, find_format(field.format))
             else
               raise "invalid force param"
             end
@@ -56,21 +57,22 @@ module SimpleReport
     end
 
     def find_format(format)
-      @formats[format]
+      #@formats[format]
+      nil
     end
 
     def add_formats
-      money = @workbook.add_format
-      money.set_num_format('$0.00')
-      add_format :money, money
+      #money = @workbook.add_format
+      #money.set_num_format('$0.00')
+      #add_format :money, money
 
-      heading = @workbook.add_format
-      heading.set_bold
-      add_format :heading, heading
+      #heading = @workbook.add_format
+      #heading.set_bold
+      #add_format :heading, heading
 
-      percent = @workbook.add_format
-      percent.set_num_format('0.0%')
-      add_format :percent, percent
+      #percent = @workbook.add_format
+      #percent.set_num_format('0.0%')
+      #add_format :percent, percent
     end
 
     def build_report

@@ -1,4 +1,5 @@
-require "write_xlsx"
+require "rubyXL"
+require 'rubyXL/convenience_methods'
 require "simple_report/version"
 require "simple_report/base"
 require "simple_report/sheet"

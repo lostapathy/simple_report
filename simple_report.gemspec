@@ -25,5 +25,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "minitest", "~> 5.0"
 
-  spec.add_dependency "write_xlsx", '~> 0.85.1'
+  spec.add_dependency "rubyXL", '~> 3.4.6'
 end
