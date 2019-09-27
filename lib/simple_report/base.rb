@@ -27,13 +27,15 @@ module SimpleReport
     def generate_report
       @workbook = RubyXL::Workbook.new
       @workbook.worksheets.pop # Delete the default Sheet1 worksheet
-      add_formats
+
       @sheets.each do |sheet|
         output_sheet = @workbook.add_worksheet(sheet.name)
         sheet.fields.each_with_index do |f, index|
           output_sheet.change_column_width(index, f.width) unless f.width.nil?
-          output_sheet.add_cell(0, index, f.name) #, @formats[:heading])
+          output_sheet.add_cell(0, index, f.name)
+          output_sheet.sheet_data[0][index].change_font_bold(true)
         end
+
         sheet.collection.each_with_index do |ic, record_num|
           sheet.fields.each_with_index do |field, column|
             if field.field
@@ -52,28 +54,21 @@ module SimpleReport
             else
               raise "invalid force param"
             end
+            output_sheet[record_num + 1][column].set_number_format find_format(field.format) if field.format
           end
         end
       end
     end
 
     def find_format(format)
-      #@formats[format]
-      nil
-    end
-
-    def add_formats
-      #money = @workbook.add_format
-      #money.set_num_format('$0.00')
-      #add_format :money, money
-
-      #heading = @workbook.add_format
-      #heading.set_bold
-      #add_format :heading, heading
-
-      #percent = @workbook.add_format
-      #percent.set_num_format('0.0%')
-      #add_format :percent, percent
+      case format
+      when :money
+        '$#,###.00'
+      when :percent
+        '00%'
+      else
+        nil
+      end
     end
 
     def build_report
