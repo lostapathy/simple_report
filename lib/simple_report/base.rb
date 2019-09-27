@@ -26,6 +26,7 @@ module SimpleReport
 
     def generate_report
       @workbook = RubyXL::Workbook.new
+      @workbook.worksheets.pop # Delete the default Sheet1 worksheet
       add_formats
       @sheets.each do |sheet|
         output_sheet = @workbook.add_worksheet(sheet.name)
