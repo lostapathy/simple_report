@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+require 'erb'
+require 'rubyXL'
+require 'optparse'
+
+class Column < Struct.new(:name, :instructions, :column)
+end
+
+column_letters = Hash.new {|hash, key| hash[key] = hash[key - 1].next }.merge({0 => "A"})
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: build_template [options]"
+
+  opts.accept(File) do |path|
+    raise ArgumentError, 'Invalid template file path' unless File.file?(path)
+
+    path
+  end
+
+  opts.on("-f", "--template-file URI", File, "Template File Path") do |f|
+    @template_path = f
+  end
+
+  opts.on("-t", "--title-row TITLEROW", Integer, "Number of row containing titles") do |t|
+    @title_row = t
+  end
+
+  opts.on("-s", "--sheet SHEET", String, "Sheet containing template") do |s|
+    @sheet = s
+  end
+end.parse!
+
+workbook = RubyXL::Parser.parse @template_path
+
+sheet = workbook[@sheet]
+row = sheet[@title_row - 1]
+
+raise ArgumentError, 'Invalid --sheet name' if sheet.nil?
+raise ArgumentError, 'Invalid --title-row' if row.nil?
+
+@columns = []
+row.cells.each do |cell|
+  contents = cell.value.split(/\n/)
+  @columns << Column.new(contents[0].strip, contents[1..99].join(' - '), column_letters[cell.column])
+end
+
+erb_template = File.read(File.expand_path(File.dirname(__FILE__) + '/../lib/templates/newclass.erb'))
+
+puts ERB.new(erb_template).result(binding)
