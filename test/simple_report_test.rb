@@ -8,15 +8,26 @@ end
 class NoReport < SimpleReport::Base
 end
 
+class TemplatedReport < SimpleReport::Base
+  def build_report
+    template_path 'test/template.xlsx'
+    skip_rows 2
+    skip_headings
+
+    add_sheet 'Sheet1', (1..10) do |sheet|
+      sheet.add_field('Field Name', width: 20) { |x| x }
+    end
+  end
+end
+
 class MinimalReport < SimpleReport::Base
   def build_report
     add_sheet 'First tab', (1..10) do |sheet|
       sheet.add_field('Field Name', width: 20) { |x| x }
-
     end
+
     add_sheet 'Second tab', (1..10) do |sheet|
       sheet.add_field('Field Name', width: 20) { |x| x }
-
     end
   end
 end
@@ -79,5 +90,26 @@ class SimpleReportTest < Minitest::Test
     report = BlockReport.new
     data = report.to_xlsx
     refute_nil data
+  end
+
+  def test_report_with_template
+    report = TemplatedReport.new
+    data = report.to_xlsx
+    refute_nil data
+
+    file = Tempfile.new(%w[test_simple_report .xlsx])
+    file.write(data)
+    file.close
+
+    FileUtils.cp file.path, 'debug.xlsx'
+
+    workbook = RubyXL::Parser.parse(file.path)
+    assert_equal 'Test Header', workbook['Sheet1'][0][0].value
+    assert_equal 1, workbook['Sheet1'][2][0].value
+  end
+
+  def test_template_missing_sheet
+    skip
+    # We should throw an ArgumentError if the template does not contain the sheets our report says it should
   end
 end

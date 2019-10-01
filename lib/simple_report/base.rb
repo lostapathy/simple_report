@@ -2,11 +2,24 @@ module SimpleReport
   class Base
     def initialize
       @sheets = []
+      @skip_rows = 1 # By default, we skip a header row
+      @skip_headings = false
     end
 
-    def add_format(name, format)
-      @formats ||= {}
-      @formats[name] = format
+    # Number of rows to skip in order to get below templating
+    def skip_rows(val)
+      @skip_rows = val
+    end
+
+    # Skip outputting the heading row (useful when working from templates)
+    def skip_headings(val=true)
+      @skip_headings = val
+    end
+
+    def template_path(template_path)
+      raise ArgumentError, 'File does not exist' unless File.file?(template_path)
+
+      @template_path = template_path
     end
 
     def to_xlsx(*params)
@@ -25,15 +38,17 @@ module SimpleReport
     end
 
     def generate_report
-      @workbook = RubyXL::Workbook.new
-      @workbook.worksheets.pop # Delete the default Sheet1 worksheet
+      setup_workbook
 
       @sheets.each do |sheet|
-        output_sheet = @workbook.add_worksheet(sheet.name)
-        sheet.fields.each_with_index do |f, index|
-          output_sheet.change_column_width(index, f.width) unless f.width.nil?
-          output_sheet.add_cell(0, index, f.name)
-          output_sheet.sheet_data[0][index].change_font_bold(true)
+        output_sheet = @workbook[sheet.name]
+
+        unless @skip_headings
+          sheet.fields.each_with_index do |f, index|
+            output_sheet.change_column_width(index, f.width) unless f.width.nil?
+            output_sheet.add_cell(0, index, f.name)
+            output_sheet.sheet_data[0][index].change_font_bold(true)
+          end
         end
 
         sheet.collection.each_with_index do |ic, record_num|
@@ -48,13 +63,14 @@ module SimpleReport
 
             case field.force
             when nil
-              output_sheet.add_cell(record_num + 1, column, value)#, find_format(field.format))
+              output_sheet.add_cell(record_num + @skip_rows, column, value)#, find_format(field.format))
             when :string
-              output_sheet.add_cell(record_num + 1, column, value.to_s) #, find_format(field.format))
+              output_sheet.add_cell(record_num + @skip_rows, column, value.to_s) #, find_format(field.format))
             else
               raise "invalid force param"
             end
-            output_sheet[record_num + 1][column].set_number_format find_format(field.format) if field.format
+
+            output_sheet[record_num + @skip_rows][column].set_number_format find_format(field.format) if field.format
           end
         end
       end
@@ -73,6 +89,21 @@ module SimpleReport
 
     def build_report
       raise NotImplementedError.new('<report>#build_report not implemented')
+    end
+
+    private
+
+    def setup_workbook
+      if @template_path.nil?
+        @workbook = RubyXL::Workbook.new
+        @workbook.worksheets.pop # Delete the default Sheet1 worksheet
+
+        @sheets.each do |sheet|
+          @workbook.add_worksheet(sheet.name)
+        end
+      else
+        @workbook = RubyXL::Parser.parse(@template_path)
+      end
     end
   end
 end
