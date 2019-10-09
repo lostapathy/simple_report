@@ -8,8 +8,8 @@ module SimpleReport
       @fields = []
     end
 
-    def add_field(name, field = nil, width: nil, format: nil, value: nil, force: nil, &block)
-      @fields << Field.new(name, field, width: width, format: format, value: value, force: force, &block)
+    def add_field(name, field = nil, width: nil, format: nil, value: nil, force: nil, formula: nil, &block)
+      @fields << Field.new(name, field, width: width, format: format, value: value, force: force, formula: formula, &block)
     end
   end
 end

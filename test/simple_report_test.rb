@@ -15,7 +15,7 @@ class TemplatedReport < SimpleReport::Base
     skip_headings
 
     add_sheet 'Sheet1', (1..10) do |sheet|
-      sheet.add_field('Field Name', width: 20) { |x| x }
+      sheet.add_field('Field Name', width: 20, value: 1)
     end
   end
 end
@@ -101,7 +101,7 @@ class SimpleReportTest < Minitest::Test
     file.write(data)
     file.close
 
-    FileUtils.cp file.path, 'debug.xlsx'
+    # FileUtils.cp file.path, 'debug.xlsx'
 
     workbook = RubyXL::Parser.parse(file.path)
     assert_equal 'Test Header', workbook['Sheet1'][0][0].value

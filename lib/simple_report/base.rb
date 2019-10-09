@@ -61,13 +61,19 @@ module SimpleReport
               value = field.block.call(ic, record_num + 2)
             end
 
-            case field.force
-            when nil
-              output_sheet.add_cell(record_num + @skip_rows, column, value)#, find_format(field.format))
-            when :string
-              output_sheet.add_cell(record_num + @skip_rows, column, value.to_s) #, find_format(field.format))
+            formula = field.formula
+            if formula.nil?
+              # FIXME: rename force to something more obvious
+              case field.force
+              when nil
+                output_sheet.add_cell(record_num + @skip_rows, column, value)
+              when :string
+                output_sheet.add_cell(record_num + @skip_rows, column, value.to_s)
+              else
+                raise "invalid force param"
+              end
             else
-              raise "invalid force param"
+              output_sheet.add_cell(record_num + @skip_rows, column, '', formula.gsub('_ROW_', (record_num + @skip_rows + 1).to_s))
             end
 
             output_sheet[record_num + @skip_rows][column].set_number_format find_format(field.format) if field.format
