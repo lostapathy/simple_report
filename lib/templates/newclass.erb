@@ -9,7 +9,7 @@ class TemplatedReport < SimpleReport::Base
     skip_rows <%= @title_row %>
     skip_headings
 
-    add_sheet '<%= @sheet %>', data do
+    add_sheet '<%= @sheet %>', data do |sheet|
 <% @columns.each do |column| %>
       # <%= column.name %><% if column.instructions.size > 0 %>
       # <%= column.instructions %><% end %>
