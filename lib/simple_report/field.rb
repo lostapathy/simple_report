@@ -2,7 +2,7 @@ module SimpleReport
   class Field
     attr_reader :name, :width, :block, :format, :field, :value, :force, :formula
 
-    def initialize(name, field, format: nil, width: 10, value: nil, force: nil, formula: nil &block)
+    def initialize(name, field, format: nil, width: 10, value: nil, force: nil, formula: nil, &block)
       @name = name
       @field = field
       @width = width
