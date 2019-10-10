@@ -15,7 +15,7 @@ class TemplatedReport < SimpleReport::Base
     skip_headings
 
     add_sheet 'Sheet1', (1..10) do |sheet|
-      sheet.add_field('Field Name', width: 20, value: 1)
+      sheet.add_field('Field Name', width: 20) { |x| x }
     end
   end
 end
