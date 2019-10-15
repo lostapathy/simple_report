@@ -4,6 +4,7 @@ module SimpleReport
       @sheets = []
       @skip_rows = 1 # By default, we skip a header row
       @skip_headings = false
+      @template_path = nil
     end
 
     # Number of rows to skip in order to get below templating
@@ -62,7 +63,9 @@ module SimpleReport
             end
 
             formula = field.formula
-            if formula.nil?
+            if !formula.nil? && formula != ''
+              output_sheet.add_cell(record_num + @skip_rows, column, '', formula.gsub('_ROW_', (record_num + @skip_rows + 1).to_s))
+            elsif !value.nil? && value != ''
               # FIXME: rename force to something more obvious
               case field.force
               when nil
@@ -72,8 +75,6 @@ module SimpleReport
               else
                 raise "invalid force param"
               end
-            else
-              output_sheet.add_cell(record_num + @skip_rows, column, '', formula.gsub('_ROW_', (record_num + @skip_rows + 1).to_s))
             end
 
             output_sheet[record_num + @skip_rows][column].set_number_format find_format(field.format) if field.format
