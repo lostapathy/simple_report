@@ -77,7 +77,7 @@ module SimpleReport
               end
             end
 
-            output_sheet[record_num + @skip_rows][column].set_number_format find_format(field.format) if field.format
+            output_sheet[record_num + @skip_rows][column]&.set_number_format find_format(field.format) if field.format
           end
         end
       end

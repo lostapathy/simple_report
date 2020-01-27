@@ -20,6 +20,18 @@ class TemplatedReport < SimpleReport::Base
   end
 end
 
+class FormattedReport < SimpleReport::Base
+  Record = Struct.new(:name, :price)
+  def build_report
+    test_data = [Record.new('row2', nil)]
+
+    add_sheet 'First tab', test_data do |sheet|
+      sheet.add_field('Field Name', width: 20) { |x| x.name }
+      sheet.add_field('Money', :price, format: :money)
+    end
+  end
+end
+
 class MinimalReport < SimpleReport::Base
   def build_report
     add_sheet 'First tab', (1..10) do |sheet|
@@ -106,6 +118,13 @@ class SimpleReportTest < Minitest::Test
     workbook = RubyXL::Parser.parse(file.path)
     assert_equal 'Test Header', workbook['Sheet1'][0][0].value
     assert_equal 1, workbook['Sheet1'][2][0].value
+  end
+
+  def test_format_nils
+    # a nil value in a formatted cell was raising an exception
+    report = FormattedReport.new
+    data = report.to_xlsx
+    refute_nil data
   end
 
   def test_template_missing_sheet
